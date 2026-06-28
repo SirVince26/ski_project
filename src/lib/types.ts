@@ -1,4 +1,4 @@
-export type Region = 'new-england' | 'mid-atlantic' | 'southeast';
+export type Region = 'new-england' | 'mid-atlantic' | 'southeast' | 'rockies' | 'west-coast' | 'midwest';
 export type DifficultyLevel = 'beginner' | 'intermediate' | 'advanced' | 'all-levels';
 export type SkillLevel = 'beginner' | 'intermediate' | 'advanced' | 'expert';
 export type TripStatus = 'planned' | 'completed' | 'cancelled';
@@ -30,6 +30,20 @@ export interface Resort {
   website_url: string | null;
   description: string | null;
   image_url: string | null;
+  
+  // Phase 4 Extensions
+  country: string;
+  elevation_ft: number | null;
+  beginner_percent: number | null;
+  intermediate_percent: number | null;
+  advanced_percent: number | null;
+  expert_percent: number | null;
+  terrain_parks: boolean;
+  family_score: number | null;
+  nightlife_score: number | null;
+  lift_ticket_url: string | null;
+  images: string[];
+  
   created_at: string;
 }
 

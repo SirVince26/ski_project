@@ -23,7 +23,7 @@ CREATE TABLE public.resorts (
   name TEXT NOT NULL,
   slug TEXT UNIQUE NOT NULL,       -- URL-friendly name
   state TEXT NOT NULL,             -- e.g., "VT", "ME", "NH"
-  region TEXT NOT NULL CHECK (region IN ('new-england', 'mid-atlantic', 'southeast')),
+  region TEXT NOT NULL CHECK (region IN ('new-england', 'mid-atlantic', 'southeast', 'rockies', 'west-coast', 'midwest')),
   latitude DOUBLE PRECISION NOT NULL,
   longitude DOUBLE PRECISION NOT NULL,
   vertical_drop_ft INTEGER,
@@ -171,3 +171,19 @@ CREATE TRIGGER profiles_updated_at
 CREATE TRIGGER trips_updated_at
   BEFORE UPDATE ON public.trips
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at();
+
+-- ============================================
+-- PHASE 4 ENHANCEMENTS: RESORTS EXTENSION
+-- ============================================
+ALTER TABLE public.resorts
+  ADD COLUMN country TEXT DEFAULT 'USA',
+  ADD COLUMN elevation_ft INTEGER,
+  ADD COLUMN beginner_percent INTEGER,
+  ADD COLUMN intermediate_percent INTEGER,
+  ADD COLUMN advanced_percent INTEGER,
+  ADD COLUMN expert_percent INTEGER,
+  ADD COLUMN terrain_parks BOOLEAN DEFAULT false,
+  ADD COLUMN family_score INTEGER CHECK (family_score BETWEEN 1 AND 10),
+  ADD COLUMN nightlife_score INTEGER CHECK (nightlife_score BETWEEN 1 AND 10),
+  ADD COLUMN lift_ticket_url TEXT,
+  ADD COLUMN images TEXT[] DEFAULT '{}';

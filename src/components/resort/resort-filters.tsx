@@ -52,7 +52,7 @@ export function ResortFilters() {
   const currentDifficulty = searchParams.get("difficulty") || "all";
 
   return (
-    <div className="bg-slate-50 p-4 rounded-xl border mb-6 flex flex-col md:flex-row gap-4 items-end">
+    <div className="bg-muted p-4 rounded-xl border mb-6 flex flex-col md:flex-row gap-4 items-end">
       <div className="flex-1 w-full space-y-2">
         <label className="text-sm font-medium">Region</label>
         <Select value={currentRegion} onValueChange={handleRegionChange}>

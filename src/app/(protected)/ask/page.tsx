@@ -47,10 +47,10 @@ export default function AskAIPage() {
   return (
     <div className="container py-10 max-w-4xl">
       <div className="flex flex-col items-center text-center space-y-4 mb-10">
-        <div className="p-4 bg-blue-100 rounded-full">
-          <Sparkles className="h-8 w-8 text-blue-600" />
+        <div className="p-4 bg-primary/10 rounded-full ring-1 ring-primary/20">
+          <Sparkles className="h-8 w-8 text-primary" />
         </div>
-        <h1 className="text-4xl font-bold tracking-tight">Ask SkiTrip AI</h1>
+        <h1 className="text-4xl font-bold tracking-tight">Ask Corduroy</h1>
         <p className="text-xl text-muted-foreground max-w-2xl">
           Tell us what you're looking for in your next ski trip, and our AI will recommend the perfect resorts for you.
         </p>
@@ -80,7 +80,7 @@ export default function AskAIPage() {
       )}
 
       {message && (
-        <div className="p-8 text-center border rounded-xl bg-slate-50 text-muted-foreground">
+        <div className="p-8 text-center border rounded-xl bg-muted text-muted-foreground">
           {message}
         </div>
       )}
@@ -90,13 +90,13 @@ export default function AskAIPage() {
           <h2 className="text-2xl font-bold">Top Recommendations</h2>
           <div className="grid md:grid-cols-3 gap-6">
             {recommendations.map((rec, index) => (
-              <Card key={rec.resort.id} className="flex flex-col border-blue-200 shadow-sm relative overflow-hidden">
-                <div className="absolute top-0 left-0 w-full h-1 bg-blue-500"></div>
-                <div className="p-4 bg-blue-50/50">
-                  <div className="inline-block px-2 py-1 bg-blue-100 text-blue-800 text-xs font-bold rounded mb-2">
+              <Card key={rec.resort.id} className="flex flex-col border-primary/20 shadow-sm relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-full h-1 bg-primary"></div>
+                <div className="p-4 bg-primary/5">
+                  <div className="inline-block px-2 py-1 bg-primary/10 text-primary text-xs font-bold rounded mb-2">
                     Rank #{index + 1}
                   </div>
-                  <p className="text-sm italic text-slate-700">"{rec.explanation}"</p>
+                  <p className="text-sm italic text-muted-foreground">"{rec.explanation}"</p>
                 </div>
                 <div className="flex-1 p-0">
                   <ResortCard resort={rec.resort} />

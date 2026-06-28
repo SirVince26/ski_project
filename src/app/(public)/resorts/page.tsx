@@ -30,7 +30,7 @@ export default async function ResortsPage({ searchParams }: Props) {
     <div className="container py-10 px-4 md:px-6">
       <div className="flex flex-col gap-6">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">East Coast Ski Resorts</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Ski Resorts</h1>
           <p className="text-muted-foreground mt-2">
             Browse and filter resorts by region, difficulty, and price.
           </p>

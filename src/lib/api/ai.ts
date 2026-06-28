@@ -24,7 +24,7 @@ export async function extractFiltersFromQuery(query: string): Promise<ParsedFilt
 
   const prompt = `
     Extract search filters from the following user query for ski resorts.
-    Valid regions: new-england, mid-atlantic, southeast.
+    Valid regions: new-england, mid-atlantic, southeast, rockies, west-coast, midwest.
     Valid difficulty: beginner, intermediate, advanced, all-levels.
     Valid sort_by: price, snow, size, distance.
     If a filter is not mentioned, leave it null.
@@ -66,19 +66,32 @@ export async function rankAndExplainResorts(query: string, resorts: Resort[]): P
   const resortsData = resorts.map(r => ({
     id: r.id,
     name: r.name,
+    state: r.state,
     price: r.lift_ticket_price_usd,
     region: r.region,
     difficulty: r.difficulty_level,
-    description: r.description
+    vertical_drop_ft: r.vertical_drop_ft,
+    skiable_acres: r.skiable_acres,
+    num_trails: r.num_trails,
+    beginner_pct: r.beginner_percent,
+    intermediate_pct: r.intermediate_percent,
+    advanced_pct: r.advanced_percent,
+    expert_pct: r.expert_percent,
+    terrain_parks: r.terrain_parks,
+    family_score: r.family_score,
+    nightlife_score: r.nightlife_score,
+    description: r.description,
   }));
 
   const prompt = `
     The user is asking: "${query}"
     
-    Here is a list of matching ski resorts:
+    Here is a list of matching ski resorts with their structured attributes:
     ${JSON.stringify(resortsData, null, 2)}
     
-    Rank the top 3 best matching resorts based on the user's query and provide a short, engaging 1-2 sentence explanation of WHY each resort is a good fit for this specific user.
+    Rank the top 3 best matching resorts based on the user's query.
+    Use the structured data (difficulty percentages, terrain parks, family/nightlife scores, skiable acres, etc.) to justify your rankings.
+    Provide a short, engaging 1-2 sentence explanation of WHY each resort is a good fit, citing specific data points.
     Return an array of objects containing the resort_id and explanation.
   `;
 
