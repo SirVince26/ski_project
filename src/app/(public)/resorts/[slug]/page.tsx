@@ -13,30 +13,55 @@ interface Props {
   params: Promise<{ slug: string }>;
 }
 
-function DifficultyBar({ beginner, intermediate, advanced, expert }: {
+function DifficultyBar({ beginner, intermediate, advanced, expert, greenTrails, blueTrails, blackTrails, doubleBlackTrails }: {
   beginner?: number | null; intermediate?: number | null; advanced?: number | null; expert?: number | null;
+  greenTrails?: number | null; blueTrails?: number | null; blackTrails?: number | null; doubleBlackTrails?: number | null;
 }) {
   const b = beginner || 0;
   const i = intermediate || 0;
   const a = advanced || 0;
   const e = expert || 0;
   const total = b + i + a + e;
-  if (total === 0) return null;
+  const hasTrailCounts = (greenTrails ?? 0) + (blueTrails ?? 0) + (blackTrails ?? 0) + (doubleBlackTrails ?? 0) > 0;
+
+  if (total === 0 && !hasTrailCounts) return null;
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-3">
       <p className="text-sm font-medium text-foreground">Trail Difficulty</p>
-      <div className="flex h-3 rounded-full overflow-hidden">
-        {b > 0 && <div className="bg-green-500" style={{ width: `${b}%` }} title={`Beginner ${b}%`} />}
-        {i > 0 && <div className="bg-blue-500" style={{ width: `${i}%` }} title={`Intermediate ${i}%`} />}
-        {a > 0 && <div className="bg-black dark:bg-zinc-700" style={{ width: `${a}%` }} title={`Advanced ${a}%`} />}
-        {e > 0 && <div className="bg-orange-500" style={{ width: `${e}%` }} title={`Expert ${e}%`} />}
-      </div>
+      {total > 0 && (
+        <div className="flex h-3 rounded-full overflow-hidden">
+          {b > 0 && <div className="bg-green-500" style={{ width: `${b}%` }} title={`Beginner ${b}%`} />}
+          {i > 0 && <div className="bg-blue-500" style={{ width: `${i}%` }} title={`Intermediate ${i}%`} />}
+          {a > 0 && <div className="bg-black dark:bg-zinc-700" style={{ width: `${a}%` }} title={`Advanced ${a}%`} />}
+          {e > 0 && <div className="bg-orange-500" style={{ width: `${e}%` }} title={`Expert ${e}%`} />}
+        </div>
+      )}
       <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
-        {b > 0 && <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-green-500" />{b}% Beginner</span>}
-        {i > 0 && <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-blue-500" />{i}% Intermediate</span>}
-        {a > 0 && <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-black dark:bg-zinc-700" />{a}% Advanced</span>}
-        {e > 0 && <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-orange-500" />{e}% Expert</span>}
+        {(b > 0 || (greenTrails ?? 0) > 0) && (
+          <span className="flex items-center gap-1">
+            <span className="w-2 h-2 rounded-full bg-green-500" />
+            {hasTrailCounts ? `${greenTrails} trails` : `${b}%`} Beginner
+          </span>
+        )}
+        {(i > 0 || (blueTrails ?? 0) > 0) && (
+          <span className="flex items-center gap-1">
+            <span className="w-2 h-2 rounded-full bg-blue-500" />
+            {hasTrailCounts ? `${blueTrails} trails` : `${i}%`} Intermediate
+          </span>
+        )}
+        {(a > 0 || (blackTrails ?? 0) > 0) && (
+          <span className="flex items-center gap-1">
+            <span className="w-2 h-2 rounded-full bg-black dark:bg-zinc-700" />
+            {hasTrailCounts ? `${blackTrails} trails` : `${a}%`} Advanced
+          </span>
+        )}
+        {(e > 0 || (doubleBlackTrails ?? 0) > 0) && (
+          <span className="flex items-center gap-1">
+            <span className="w-2 h-2 rounded-full bg-orange-500" />
+            {hasTrailCounts ? `${doubleBlackTrails} trails` : `${e}%`} Expert
+          </span>
+        )}
       </div>
     </div>
   );
@@ -170,6 +195,10 @@ export default async function ResortDetailPage({ params }: Props) {
               intermediate={resort.intermediate_percent}
               advanced={resort.advanced_percent}
               expert={resort.expert_percent}
+              greenTrails={resort.green_trails}
+              blueTrails={resort.blue_trails}
+              blackTrails={resort.black_trails}
+              doubleBlackTrails={resort.double_black_trails}
             />
             {resort.family_score && (
               <div className="flex items-center justify-between pt-2 border-t border-border">

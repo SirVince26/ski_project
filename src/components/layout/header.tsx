@@ -32,6 +32,9 @@ export async function Header() {
             <Link href="/ask" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
               Ask AI
             </Link>
+            <Link href="/compare" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+              Compare
+            </Link>
           </nav>
         </div>
         <div className="flex items-center gap-4">

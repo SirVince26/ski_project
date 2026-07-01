@@ -26,8 +26,8 @@ export function UserMenu({ user }: { user: User | null }) {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="rounded-full hover:bg-slate-100 p-2 outline-none">
-        <UserCircle className="h-6 w-6 text-slate-600" />
+      <DropdownMenuTrigger className="rounded-full hover:bg-muted p-2 outline-none">
+        <UserCircle className="h-6 w-6 text-muted-foreground" />
         <span className="sr-only">Toggle user menu</span>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">

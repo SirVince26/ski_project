@@ -43,6 +43,12 @@ export interface Resort {
   nightlife_score: number | null;
   lift_ticket_url: string | null;
   images: string[];
+
+  // Phase 5: Trail counts
+  green_trails: number | null;
+  blue_trails: number | null;
+  black_trails: number | null;
+  double_black_trails: number | null;
   
   created_at: string;
 }

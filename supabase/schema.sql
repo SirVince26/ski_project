@@ -187,3 +187,12 @@ ALTER TABLE public.resorts
   ADD COLUMN nightlife_score INTEGER CHECK (nightlife_score BETWEEN 1 AND 10),
   ADD COLUMN lift_ticket_url TEXT,
   ADD COLUMN images TEXT[] DEFAULT '{}';
+
+-- ============================================
+-- PHASE 5 ENHANCEMENTS: TRAIL COUNTS
+-- ============================================
+ALTER TABLE public.resorts
+  ADD COLUMN IF NOT EXISTS green_trails INTEGER,
+  ADD COLUMN IF NOT EXISTS blue_trails INTEGER,
+  ADD COLUMN IF NOT EXISTS black_trails INTEGER,
+  ADD COLUMN IF NOT EXISTS double_black_trails INTEGER;

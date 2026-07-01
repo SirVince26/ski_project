@@ -45,7 +45,7 @@ export default function AskAIPage() {
   };
 
   return (
-    <div className="container py-10 max-w-4xl">
+    <div className="container py-10 max-w-4xl mx-auto">
       <div className="flex flex-col items-center text-center space-y-4 mb-10">
         <div className="p-4 bg-primary/10 rounded-full ring-1 ring-primary/20">
           <Sparkles className="h-8 w-8 text-primary" />

@@ -113,19 +113,103 @@ ALTER TABLE public.resorts
   ADD COLUMN lodging_search_url TEXT;
 ```
 
+### Future Lodging Comparison
+- Side-by-side hotel vs Airbnb pricing
+- Proximity-to-resort sorting
+- Group-size-aware room recommendations
+- Seasonal price estimates (peak vs off-peak)
+
+### Potential Data Sources
+| Source | Type | Auth | Notes |
+|--------|------|------|-------|
+| Google Places API | Hotels near lat/lng | API Key | Good for names/ratings, no pricing |
+| Booking.com Affiliate | Hotels + pricing | Affiliate ID | Best for real-time pricing |
+| Airbnb | Vacation rentals | Unofficial | No official API, may need scraping |
+| Hotels.com | Hotels + pricing | Affiliate | Alternate to Booking.com |
+
+---
+
+## Group Trip Planning
+
+### Overview
+Enable families and friend groups to coordinate ski trips together. Inspired by lightweight TeamSnap-style coordination.
+
+### Core Features
+- **Shared Trips:** Multiple users can be members of a single trip.
+- **Shared Itineraries:** Day-by-day plans visible to all trip members.
+- **Shared Lodging Info:** Centralized lodging details (address, check-in/out, costs).
+- **Shared Resort Recommendations:** Group members can suggest and vote on resorts.
+- **Notifications:** Email or in-app notifications for trip changes.
+
+### Database Requirements
+```sql
+-- Trip members (many-to-many between users and trips)
+CREATE TABLE public.trip_members (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  trip_id UUID NOT NULL REFERENCES public.trips(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+  role TEXT NOT NULL DEFAULT 'member' CHECK (role IN ('organizer', 'member')),
+  status TEXT NOT NULL DEFAULT 'invited' CHECK (status IN ('invited', 'accepted', 'declined')),
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(trip_id, user_id)
+);
+
+-- Trip itinerary items
+CREATE TABLE public.trip_itinerary (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  trip_id UUID NOT NULL REFERENCES public.trips(id) ON DELETE CASCADE,
+  day_date DATE NOT NULL,
+  title TEXT NOT NULL,
+  description TEXT,
+  created_by UUID REFERENCES public.profiles(id),
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Trip invitations
+CREATE TABLE public.trip_invitations (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  trip_id UUID NOT NULL REFERENCES public.trips(id) ON DELETE CASCADE,
+  invited_email TEXT NOT NULL,
+  invited_by UUID NOT NULL REFERENCES public.profiles(id),
+  status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'accepted', 'declined', 'expired')),
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  expires_at TIMESTAMPTZ DEFAULT (NOW() + INTERVAL '7 days')
+);
+```
+
+### Permission Model
+| Role | Can View | Can Edit Trip | Can Invite | Can Delete Trip |
+|------|----------|---------------|------------|-----------------|
+| Organizer | ✅ | ✅ | ✅ | ✅ |
+| Member | ✅ | Own items only | ❌ | ❌ |
+| Invited | ❌ (until accepted) | ❌ | ❌ | ❌ |
+
+### Notification Architecture
+- **Email:** Use Supabase Edge Functions + Resend/SendGrid for trip invitations and changes.
+- **In-app:** Store notifications in a `notifications` table, display via header bell icon.
+- **Events that trigger notifications:**
+  - New member invited
+  - Member accepted/declined
+  - Trip dates changed
+  - New itinerary item added
+  - Trip cancelled
+
 ---
 
 ## Agent Delegation Strategy
 
 | Feature | Best Agent | Rationale |
 |---------|-----------|-----------|
-| Resort comparison UI | Sonnet / Gemini | Straightforward component work |
-| Historical data cron job | Sonnet / Gemini | Standard API integration |
-| Weather history charts | Sonnet / Gemini | Recharts integration |
-| Progression tracking UI | Sonnet / Gemini | CRUD + profile page |
-| Checklist system | Sonnet / Gemini | JSON handling + forms |
-| Lodging API integration | Opus | Complex API auth, scraping strategy |
-| Comprehensive seed data (500+ resorts) | Opus | Needs deep knowledge + accuracy |
-| AI recommendation tuning | Opus | Prompt engineering, edge cases |
+| Resort comparison UI | Sonnet 4.6 / Gemini | ✅ Completed in Phase 5 |
+| Historical data cron job | Sonnet 4.6 | Standard API integration |
+| Weather history charts | Sonnet 4.6 | Recharts integration |
+| Progression tracking UI | Sonnet 4.6 | CRUD + profile page |
+| Checklist system | Sonnet 4.6 | JSON handling + forms |
+| Lodging API integration | Opus 4.6 | Complex API auth, scraping strategy |
+| Comprehensive seed data (500+ resorts) | Opus 4.6 | Needs deep knowledge + accuracy |
+| AI recommendation tuning | Opus 4.6 | Prompt engineering, edge cases |
+| Group Trip Planning | Opus 4.6 | Complex permissions + notifications |
+| Resort photography pipeline | Sonnet 4.6 | Image sourcing + storage |
 | Post-MVP: internationalization | Postpone | Wait until US coverage is solid |
 | Post-MVP: mobile app | Postpone | Web-first strategy |

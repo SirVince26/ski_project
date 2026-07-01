@@ -35,7 +35,7 @@ export default async function TripsPage() {
         <div className="md:col-span-2">
           <h2 className="text-2xl font-bold mb-4">My Trips</h2>
           {(!trips || trips.length === 0) ? (
-            <div className="text-center py-12 border rounded-xl bg-slate-50">
+            <div className="text-center py-12 border rounded-xl bg-muted">
               <p className="text-muted-foreground">You don't have any trips planned yet.</p>
             </div>
           ) : (
@@ -49,7 +49,7 @@ export default async function TripsPage() {
                         <Calendar size={14} className="mr-2" />
                         {new Date(trip.start_date).toLocaleDateString()} - {new Date(trip.end_date).toLocaleDateString()}
                       </div>
-                      {trip.notes && <p className="text-sm mt-2 text-slate-600">{trip.notes}</p>}
+                      {trip.notes && <p className="text-sm mt-2 text-muted-foreground">{trip.notes}</p>}
                     </div>
                     <Badge variant={trip.status === 'completed' ? 'secondary' : 'default'}>
                       {trip.status}

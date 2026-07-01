@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Inter, Outfit } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/layout/header";
+import { CompareProvider } from "@/components/resort/compare-context";
+import { CompareBar } from "@/components/resort/compare-bar";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -29,8 +31,11 @@ export default function RootLayout({
       className={`${inter.variable} ${outfit.variable} dark h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <Header />
-        {children}
+        <CompareProvider>
+          <Header />
+          {children}
+          <CompareBar />
+        </CompareProvider>
       </body>
     </html>
   );

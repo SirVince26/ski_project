@@ -3,6 +3,7 @@ import { Resort } from '@/lib/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { MapPin, Mountain, TrendingUp, DollarSign, Snowflake } from 'lucide-react';
+import { CompareCheckbox } from '@/components/resort/compare-checkbox';
 
 export function ResortCard({ resort }: { resort: Resort }) {
   const heroImage = resort.image_url || (resort.images?.length ? resort.images[0] : null);
@@ -24,6 +25,9 @@ export function ResortCard({ resort }: { resort: Resort }) {
             </div>
           )}
           <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+          <div className="absolute top-3 left-3">
+            <CompareCheckbox slug={resort.slug} />
+          </div>
           <div className="absolute top-3 right-3 flex gap-2">
             <Badge variant="secondary" className="bg-background/80 backdrop-blur-sm text-foreground text-xs border-none">
               {resort.state}
