@@ -99,3 +99,53 @@ export interface ParsedFilters {
   max_distance_miles?: number;
   sort_by?: 'price' | 'snow' | 'size' | 'distance';
 }
+
+// Phase 6: Group Trip Planning + Friends
+
+export type FriendStatus = 'pending' | 'accepted' | 'declined';
+export type TripMemberRole = 'organizer' | 'member';
+export type TripMemberStatus = 'invited' | 'accepted' | 'declined';
+
+export interface Friend {
+  id: string;
+  user_id: string;
+  friend_id: string;
+  status: FriendStatus;
+  created_at: string;
+  // Joined data
+  profile?: Profile;
+  friend_profile?: Profile;
+}
+
+export interface TripMember {
+  id: string;
+  trip_id: string;
+  user_id: string;
+  role: TripMemberRole;
+  status: TripMemberStatus;
+  created_at: string;
+  profile?: Profile;
+}
+
+export interface TripItinerary {
+  id: string;
+  trip_id: string;
+  day_date: string;
+  title: string;
+  description: string | null;
+  created_by: string | null;
+  created_at: string;
+  updated_at: string;
+  creator?: Profile;
+}
+
+export interface Notification {
+  id: string;
+  user_id: string;
+  title: string;
+  body: string | null;
+  link: string | null;
+  read: boolean;
+  created_at: string;
+}
+

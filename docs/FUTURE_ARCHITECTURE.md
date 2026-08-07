@@ -99,33 +99,126 @@ CREATE TABLE public.checklists (
 
 ## Lodging Recommendations
 
+> **Status:** Documentation only. Approved for future implementation.
+
 ### Overview
-Suggest nearby lodging options with estimated pricing.
+Suggest nearby lodging options (hotels, lodges, cabins, Airbnb) with estimated pricing, ratings, and proximity to each resort.
 
 ### Integration Requirements
-- **Potential APIs:** Google Places API, Booking.com Affiliate API, Airbnb (unofficial/scraping only).
-- **MVP alternative:** Curated links to booking sites per resort stored in a new `resort_lodging_links` table.
+- **Primary API:** Google Places API (Nearby Search) — free tier includes $200/month credit (~5,000 calls)
+- **Airbnb:** No official API. Provide curated search links using resort coordinates.
+- **Booking.com:** Affiliate API available. Requires partnership application. Best for real-time pricing.
+- **MVP alternative:** Curated links to booking sites per resort stored directly in the resorts table.
 - **Long-term:** Full integration with a hotel search aggregator API.
 
-### Database (MVP)
+### Database Schema
+
 ```sql
+-- Cached lodging results from Google Places API
+CREATE TABLE public.resort_lodging (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  resort_id UUID NOT NULL REFERENCES public.resorts(id) ON DELETE CASCADE,
+  name TEXT NOT NULL,
+  place_id TEXT UNIQUE,           -- Google Places ID for deduplication
+  rating NUMERIC(2,1),            -- e.g., 4.5
+  price_level INTEGER CHECK (price_level BETWEEN 1 AND 4),
+  address TEXT,
+  phone TEXT,
+  website_url TEXT,
+  photo_reference TEXT,           -- Google Places photo reference
+  distance_miles NUMERIC(4,1),
+  lodging_type TEXT DEFAULT 'hotel' CHECK (lodging_type IN ('hotel', 'lodge', 'resort', 'cabin', 'hostel')),
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+CREATE INDEX idx_resort_lodging_resort ON public.resort_lodging(resort_id);
+
+-- Add lodging search URLs to resorts table
 ALTER TABLE public.resorts
-  ADD COLUMN lodging_search_url TEXT;
+  ADD COLUMN IF NOT EXISTS airbnb_search_url TEXT,
+  ADD COLUMN IF NOT EXISTS booking_search_url TEXT,
+  ADD COLUMN IF NOT EXISTS lodging_search_url TEXT;
 ```
 
-### Future Lodging Comparison
-- Side-by-side hotel vs Airbnb pricing
-- Proximity-to-resort sorting
-- Group-size-aware room recommendations
-- Seasonal price estimates (peak vs off-peak)
+### RLS Policies
+```sql
+ALTER TABLE public.resort_lodging ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Anyone can view lodging"
+  ON public.resort_lodging FOR SELECT
+  USING (true);
+```
+
+### API Integration Strategy
+
+#### Google Places Nearby Search
+```
+GET https://maps.googleapis.com/maps/api/place/nearbysearch/json
+  ?location={resort_lat},{resort_lng}
+  &radius=16000       (10 miles in meters)
+  &type=lodging
+  &key={GOOGLE_PLACES_API_KEY}
+```
+
+#### Caching Strategy
+1. First request for a resort → call Google Places API → cache results in `resort_lodging` table
+2. Subsequent requests → serve from database
+3. Refresh cached data every 30 days (via `updated_at` timestamp check)
+4. API route: `GET /api/lodging/[resort-slug]`
+
+#### Airbnb Integration
+Generate search URLs dynamically:
+```
+https://www.airbnb.com/s/{resort_name}--{state}/homes?checkin={date}&checkout={date}&adults={count}
+```
+Display as an external link button on each resort's lodging section.
+
+### UI Design
+
+#### Resort Detail Page — Lodging Section
+```
+┌─────────────────────────────────────────┐
+│  🏨 Nearby Lodging                      │
+│                                         │
+│  Sort: [Price ▼] [Rating] [Distance]    │
+│                                         │
+│  ┌─────────┐ ┌─────────┐ ┌─────────┐   │
+│  │ Hotel A │ │ Lodge B │ │ Hotel C │   │
+│  │ ★★★★☆  │ │ ★★★★★  │ │ ★★★☆☆  │   │
+│  │ $$      │ │ $$$$   │ │ $       │   │
+│  │ 2.1 mi  │ │ 0.5 mi │ │ 4.3 mi  │   │
+│  └─────────┘ └─────────┘ └─────────┘   │
+│                                         │
+│  [🔗 Search Airbnb] [🔗 Search Booking] │
+└─────────────────────────────────────────┘
+```
 
 ### Potential Data Sources
 | Source | Type | Auth | Notes |
 |--------|------|------|-------|
 | Google Places API | Hotels near lat/lng | API Key | Good for names/ratings, no pricing |
 | Booking.com Affiliate | Hotels + pricing | Affiliate ID | Best for real-time pricing |
-| Airbnb | Vacation rentals | Unofficial | No official API, may need scraping |
+| Airbnb | Vacation rentals | Unofficial | No official API, use search URL links |
 | Hotels.com | Hotels + pricing | Affiliate | Alternate to Booking.com |
+
+### Lodging Comparison Features (Future)
+- Side-by-side hotel vs Airbnb pricing
+- Proximity-to-resort sorting
+- Group-size-aware room recommendations
+- Seasonal price estimates (peak vs off-peak)
+- Integration with trip cost estimation engine
+
+### Implementation Priority
+| Step | Description | Effort |
+|------|-------------|--------|
+| 1 | Add lodging URL columns to resorts table | Low |
+| 2 | Generate Airbnb/Booking search URLs for all resorts | Low |
+| 3 | Create `resort_lodging` table | Low |
+| 4 | Build API route with Google Places integration | Medium |
+| 5 | Build `<LodgingSection>` UI component | Medium |
+| 6 | Integrate into resort detail page | Low |
+
+**Requires:** `GOOGLE_PLACES_API_KEY` environment variable
 
 ---
 

@@ -40,6 +40,9 @@ export function UserMenu({ user }: { user: User | null }) {
           <Link href="/favorites" className="w-full">Favorites</Link>
         </DropdownMenuItem>
         <DropdownMenuItem>
+          <Link href="/friends" className="w-full">Friends</Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem>
           <Link href="/trips" className="w-full">My Trips</Link>
         </DropdownMenuItem>
         <DropdownMenuItem>

@@ -3,6 +3,7 @@ import { Mountain } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { UserMenu } from "@/components/auth/user-menu";
 import { GlobalSearch } from "@/components/layout/global-search";
+import { NotificationBell } from "@/components/social/notification-bell";
 
 export async function Header() {
   const supabase = await createClient();
@@ -13,6 +14,18 @@ export async function Header() {
     .from('resorts')
     .select('name, slug, state, region')
     .order('name');
+
+  // Fetch notifications for logged-in users
+  let notifications: any[] = [];
+  if (user) {
+    const { data } = await supabase
+      .from('notifications')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false })
+      .limit(20);
+    notifications = data || [];
+  }
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -37,13 +50,15 @@ export async function Header() {
             </Link>
           </nav>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
           <div className="hidden sm:block">
             <GlobalSearch resorts={resorts || []} />
           </div>
+          {user && <NotificationBell notifications={notifications} />}
           <UserMenu user={user} />
         </div>
       </div>
     </header>
   );
 }
+

@@ -101,7 +101,7 @@ export function TripForm({ resorts }: { resorts: Resort[] }) {
       </form>
 
       {/* Cost Estimate Panel */}
-      {estimate && (
+      {estimate ? (
         <div className="border rounded-xl p-4 bg-card space-y-3">
           <div className="flex items-center gap-2 text-sm font-semibold">
             <DollarSign size={16} className="text-primary" />
@@ -123,6 +123,13 @@ export function TripForm({ resorts }: { resorts: Resort[] }) {
           <div className="flex justify-between text-xs text-muted-foreground">
             <span>Per person</span>
             <span>${estimate.perPersonTotal.toLocaleString()}</span>
+          </div>
+        </div>
+      ) : (
+        <div className="border border-dashed rounded-xl p-4 bg-muted/30">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <DollarSign size={16} />
+            <span>Select a resort and dates above to see a cost estimate.</span>
           </div>
         </div>
       )}
